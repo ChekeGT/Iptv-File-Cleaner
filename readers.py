@@ -5,14 +5,16 @@ from functools import reduce
 class M3UFileReader:
 	"""Manages the reading of a m3u file."""
 
-	def read(self, file):
-		"""Manages the reading of a m3u file 
-		
+	def read(file):
+		"""Manages the reading of a m3u file
+
 		Returns a tuple with the lines in format of segments and its length.
 		"""
 
 		lines = file.readlines()
-		lines.pop(0)
+
+		if lines[0] == '#EXTM3U':
+			lines.pop(0)
 
 		return (
 			M3UFileReader.cut_lines(
@@ -23,14 +25,14 @@ class M3UFileReader:
 
 	def cut_lines(lines):
 		"""Cut all the lines in segments of 2."""
-		
+
 		new_lines = [
 			[
 				lines[lines.index(line) - 1],
 				line
-			] 
+			]
 			for line in lines
-			if not line.startswith('#') and 
+			if not line.startswith('#') and
 			not line.startswith('-') and
 			not line.startswith(' ') and
 			not line == '\n'
@@ -41,7 +43,7 @@ class M3UFileReader:
 		"""Sum all the segments and creates one only list."""
 
 		return reduce(
-			lambda x,y: x + y,
+			lambda x, y: x + y,
 			segments
 		)
 

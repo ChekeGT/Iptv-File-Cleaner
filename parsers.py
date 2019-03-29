@@ -1,6 +1,10 @@
+# Readers
+from readers import M3UFileReader
+
+
 class SimpleTextParser:
 	"""Parses a file to the format simple text."""
-	
+
 	class M3U:
 		"""How to parse the m3u Files to a simple text file."""
 
@@ -22,7 +26,7 @@ class SimpleTextParser:
 		def remap(self, segment):
 			"""Maps the segment and transforms it into the simple text format"""
 
-			url = self.get_url(segment)
-			name = self.get_name(segment)
+			url = M3UFileReader.get_url(segment)
+			name = M3UFileReader.get_name(segment)
 
 			return f'{name}{self.separator_character}{url}\n'
