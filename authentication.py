@@ -7,15 +7,15 @@ import requests
 class Authentication:
 	"""Manages all the taks related with authenticate the user."""
 
-	def __init__(session):
-		self.session = request.Session()
+	def __init__(self):
+		self.session = requests.Session()
 
-	def login(username, password):
+	def login(self, username, password):
 
 		session = self.session
 
 		payload = {
-			'email': email,
+			'username': username,
 			'password': password
 		}
 
@@ -34,7 +34,7 @@ class Authentication:
 		else:
 			return False
 
-	def is_user_premium(username):
+	def is_user_premium(self, username):
 		""""Returns if a user is premium."""
 
 		session = self.session
@@ -44,7 +44,7 @@ class Authentication:
 
 		response = request.json()
 
-		is_premium = request.get('is_premium')
+		is_premium = response.get('is_premium')
 
 		return is_premium
 
