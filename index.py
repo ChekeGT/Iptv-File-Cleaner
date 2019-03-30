@@ -16,8 +16,34 @@ from parsers import SimpleTextParser
 # Writers
 from writers import BaseFileWriter
 
+# Authentication
+from authentication import Authentication
+
 
 class Menu:
+
+	def login():
+		username = Menu.GetData.get_username()
+		password = Menu.GetData.get_password()
+
+		session = Authentication()
+
+		if session.login(username, password):
+
+			if session.is_user_premium(username):
+				Menu.pick_an_option()
+
+			else:
+				print('Necesitas comprar el programa antes de usarlo :(.')
+				exit()
+
+		else:
+			print('Credenciales invalidas :(.')
+			sleep(2)
+			cls()
+			Menu.login()
+
+		
 
 	def pick_an_option():
 		"""The option menu."""
@@ -116,5 +142,15 @@ class Menu:
 			separator_character = input("Introduce el caracter separador porfavor(Deja vacio o da un espacio para espacio):\n")
 			return separator_character
 
+		def get_username():
+			""""Manages obtaining the username"""
+			username = input('Introduce tu nombre de usuario:\n')
+			return username
 
-Menu.pick_an_option()
+		def get_password():
+			"""Manages obtaining password"""
+			password = input('Introduce tu contrasena:\n')
+			return password
+
+
+Menu.login()
