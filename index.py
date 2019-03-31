@@ -1,156 +1,206 @@
-# Utilities
-from io import open
-from sys import exit
-from time import sleep
-from utilites import cls
-
-# Cleaners
-from cleaners import M3UFileCleaner
-
-# Readers
-from readers import M3UFileReader
-
-# Parsers
-from parsers import SimpleTextParser
-
-# Writers
-from writers import BaseFileWriter
+# PyQt
+from PyQt5.QtGui import QIcon, QPalette, QColor, QPixmap, QFont
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import (
+	QApplication,
+	QMainWindow,
+	QFrame,
+	QLabel,
+	QComboBox, 
+	QLineEdit,
+	QPushButton,
+    QMessageBox,
+    QDialog
+)
+from PyQt5 import uic
 
 # Authentication
 from authentication import Authentication
 
-
-class Menu:
-
-	def login():
-		username = Menu.GetData.get_username()
-		password = Menu.GetData.get_password()
-
-		session = Authentication()
-
-		if session.login(username, password):
-
-			if session.is_user_premium(username):
-				Menu.pick_an_option()
-
-			else:
-				print('Necesitas comprar el programa antes de usarlo :(.')
-				exit()
-
-		else:
-			print('Credenciales invalidas :(.')
-			sleep(2)
-			cls()
-			Menu.login()
-
-		
-
-	def pick_an_option():
-		"""The option menu."""
-		while True:
-			print("1)Limpiar una lista M3U\n2)Transformar archivo M3U a Simple Text \n3)Salir\n")
-			option = input("Elige una opcion:\n")
-
-			if option == "1":
-				Menu.option1()
-			elif option == "2":
-				Menu.option2()
-			elif option == "3":
-				Menu.option3()
-			else:
-				print("Por favor elige una opcion correcta.")
-				sleep(1)
-				Menu.pick_an_option()
-
-	def option1():
-		"""What to do if the user picks option 1
-		Handles getting data from the user, and
-		calls Cleaner Class to clean the file.
-		"""
-		file = Menu.GetData.get_file()
-		output_file = Menu.GetData.get_output_file()
-
-		patterns = Menu.GetData.get_patterns()
-
-		cleaner = M3UFileCleaner(patterns)
-		cleaner.delete_unneeded_lines(file, output_file)
-
-		cls()
-
-		print(f'Se han borrado {cleaner.deleted_lines} lineas.')
-
-		sleep(2)
-
-	def option2():
-		"""What to do if user picks option 2.
-
-		Parses a m3u file to a simple_text file.
-		"""
-
-		file = Menu.GetData.get_file()
-		output_file = Menu.GetData.get_output_file()
-		separator_character = Menu.GetData.get_separator_character()
-
-		segments, length = M3UFileReader.read(file)
-
-		parser = SimpleTextParser.M3U(separator_character)
-		simple_text_list = parser.parse(segments)
-
-		BaseFileWriter.write_lines(simple_text_list, output_file)
-
-		print(f'{length} lineas han sido convertidas a formato Simple Text')
-
-	def option3():
-		"""What to do if user picks option 3.
-		Exits the program.
-		"""
-		print("Hasta luego :).")
-		exit()
-
-	class GetData:
-
-		def get_patterns():
-			"""Manages obtaining user patterns."""
-
-			patterns = []
-			while True:
-				new_pattern = input('Introduce un patron(C para cancelar)')
-				if new_pattern == 'C':
-					break
-				else:
-					patterns.append(new_pattern)
-			return patterns
-
-		def get_file():
-			"""Manages obtaining initial file."""
-
-			file_name = input('Introduce el nombre de tu archivo con extension\n')
-			file = open(file_name, 'r+', encoding='utf-8')
-
-			return file
-
-		def get_output_file():
-			"""Manages obtaining output file."""
-
-			output_file_name = input('Introduce el nombre de el archivo de salida\n')
-			output_file = open(output_file_name, 'w', encoding='utf-8')
-
-			return output_file
-
-		def get_separator_character():
-			"""Manages obtaining the separator character from user"""
-			separator_character = input("Introduce el caracter separador porfavor(Deja vacio o da un espacio para espacio):\n")
-			return separator_character
-
-		def get_username():
-			""""Manages obtaining the username"""
-			username = input('Introduce tu nombre de usuario:\n')
-			return username
-
-		def get_password():
-			"""Manages obtaining password"""
-			password = input('Introduce tu contrasena:\n')
-			return password
+# Sys
+import sys
 
 
-Menu.login()
+class ParsingCleaningWindow(QDialog):
+
+    def __init__(self, parent=None):
+        super(ParsingCleaningWindow, self).__init__(parent)
+        self.setWindowTitle('Iptv File Cleaner | Limpiar o cambiar formato')
+        self.setWindowIcon(QIcon("img/icon.png"))
+        uic.loadUi('ui/parsing_cleaning.ui')
+
+
+class WindowLogin(QMainWindow):
+    """Manages the graphical representation of the login."""
+
+    def __init__(self, parent=None):
+        """Handles the initialization of the class"""
+
+        super(WindowLogin, self).__init__(parent)
+        
+        self.setWindowTitle("Iptv File Cleaner | Iniciar Sesion")
+        self.setWindowIcon(QIcon("img/icon.png"))
+        self.setWindowFlags(Qt.WindowCloseButtonHint | Qt.MSWindowsFixedSizeDialogHint)
+        self.setFixedSize(400, 380)
+
+        palette = QPalette()
+        palette.setColor(QPalette.Background, QColor(243, 243, 243))
+        self.setPalette(palette)
+
+        self.parsing_cleaning_window = ParsingCleaningWindow()
+        self.initUI()
+
+    def initUI(self):
+        """Sets up the graphical interphace."""
+
+        palette = QPalette()
+        palette.setColor(QPalette.Background, QColor(51, 0, 102))
+
+        frame = QFrame(self)
+        frame.setFrameShape(QFrame.NoFrame)
+        frame.setFrameShadow(QFrame.Sunken)
+        frame.setAutoFillBackground(True)
+        frame.setPalette(palette)
+        frame.setFixedWidth(400)
+        frame.setFixedHeight(84)
+        frame.move(0, 0)
+
+        iconLabel = QLabel(frame)
+        iconLabel.setFixedWidth(40)
+        iconLabel.setFixedHeight(40)
+        iconLabel.setPixmap(QPixmap("img/icon.png").scaled(40, 40, Qt.KeepAspectRatio,
+                                                         Qt.SmoothTransformation))
+        iconLabel.move(37, 22)
+
+        titleFont = QFont()
+        titleFont.setPointSize(16)
+        titleFont.setBold(True)
+
+        titleLabel = QLabel("<font color='white'>Iptv File Cleaner.</font>", frame)
+        titleLabel.setFont(titleFont)
+        titleLabel.move(83, 20)
+
+        subtitleFont = QFont()
+        subtitleFont.setPointSize(9)
+
+        subtitleLabel = QLabel("<font color='white'>Inicia sesion usuario premium."
+                                "</font>", frame)
+        subtitleLabel.setFont(subtitleFont)
+        subtitleLabel.move(111, 46)
+
+
+        userLabel = QLabel("Usuario", self)
+        userLabel.move(60, 170)
+
+        userFrame = QFrame(self)
+        userFrame.setFrameShape(QFrame.StyledPanel)
+        userFrame.setFixedWidth(280)
+        userFrame.setFixedHeight(28)
+        userFrame.move(60, 196)
+
+        userImage = QLabel(userFrame)
+        userImage.setPixmap(QPixmap("img/user.png").scaled(20, 20, Qt.KeepAspectRatio,
+                                                              Qt.SmoothTransformation))
+        userImage.move(10, 4)
+
+        self.lineEditUser = QLineEdit(userFrame)
+        self.lineEditUser.setFrame(False)
+        self.lineEditUser.setTextMargins(8, 0, 4, 1)
+        self.lineEditUser.setFixedWidth(238)
+        self.lineEditUser.setFixedHeight(26)
+        self.lineEditUser.move(40, 1)
+
+
+        passwordLabel = QLabel("Contraseña", self)
+        passwordLabel.move(60, 224)
+
+        passwordFrame = QFrame(self)
+        passwordFrame.setFrameShape(QFrame.StyledPanel)
+        passwordFrame.setFixedWidth(280)
+        passwordFrame.setFixedHeight(28)
+        passwordFrame.move(60, 250)
+
+        passwordImage = QLabel(passwordFrame)
+        passwordImage.setPixmap(QPixmap("img/password.png").scaled(20, 20, Qt.KeepAspectRatio,
+                                                                     Qt.SmoothTransformation))
+        passwordImage.move(10, 4)
+
+        self.lineEditPassword = QLineEdit(passwordFrame)
+        self.lineEditPassword.setFrame(False)
+        self.lineEditPassword.setEchoMode(QLineEdit.Password)
+        self.lineEditPassword.setTextMargins(8, 0, 4, 1)
+        self.lineEditPassword.setFixedWidth(238)
+        self.lineEditPassword.setFixedHeight(26)
+        self.lineEditPassword.move(40, 1)
+
+
+        loginButton = QPushButton("Iniciar sesión", self)
+        loginButton.setFixedWidth(135)
+        loginButton.setFixedHeight(28)
+        loginButton.move(60, 286)
+
+        cancelButton = QPushButton("Cerrar", self)
+        cancelButton.setFixedWidth(135)
+        cancelButton.setFixedHeight(28)
+        cancelButton.move(205, 286)
+
+        infoLink = 'https://localhost:63342/index.html'
+
+        informationLabel = QLabel(f"<a href='{infoLink}'>Comprar</a>.", self)
+        informationLabel.setOpenExternalLinks(True)
+        informationLabel.setToolTip("Create una cuenta y compra el programa")
+        informationLabel.move(15, 344)
+
+
+        loginButton.clicked.connect(self.login)
+        cancelButton.clicked.connect(self.close)
+
+    def login(self):
+        """Verifies if the user is premium
+
+        If is premium this will open the window containing the program logic.
+        If is'nt premium will send an alert saying the user buy the program.
+        """
+        username = self.lineEditUser.text()
+        password = self.lineEditPassword.text()
+        authentication = Authentication()
+
+        msgBox = QMessageBox()
+        msgBox.setWindowTitle('Error al iniciar sesion.')
+
+        
+        if authentication.login(username, password):
+            if authentication.is_user_premium(username):
+                self.openParsingCleaningWindow()
+            else:
+                msgBox.setText('No eres un usuario premium, por favor compra la aplicacion')
+                msgBox.exec_()
+
+        else:
+            msgBox.setText('Credenciales invalidas :(.')
+            msgBox.exec_()
+
+
+        self.lineEditUser.clear()
+        self.lineEditPassword.clear()
+
+    def openParsingCleaningWindow(self):
+        """Handles opening the window that contains all the logic of parsing and cleaning lists."""
+
+        self.close()
+        self.parsing_cleaning_window.exec_()
+
+
+if __name__ == '__main__':
+
+    application = QApplication(sys.argv)
+    font = QFont()
+    font.setPointSize(10)
+    font.setFamily("Bahnschrift Light")
+
+    application.setFont(font)
+    
+    window = WindowLogin()
+    window.show()
+
+sys.exit(application.exec_())
