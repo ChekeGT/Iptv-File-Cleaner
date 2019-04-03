@@ -1,3 +1,8 @@
+"""Cleaners module 
+
+Handles all the stuff related to delete patterns of iptv lists.
+"""
+
 # Readers
 from readers import M3UFileReader
 

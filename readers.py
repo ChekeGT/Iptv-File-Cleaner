@@ -1,3 +1,5 @@
+"""Manages reading and putting the lists in easier formats to work with."""
+
 # Utilities
 from functools import reduce
 

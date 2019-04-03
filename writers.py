@@ -1,3 +1,5 @@
+"""Manages writing the lines on files."""
+
 class BaseFileWriter:
 	"""Manages writing of files."""
 

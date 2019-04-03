@@ -1,3 +1,8 @@
+"""Cleaners module 
+
+Handles all the stuff related to change the type of iptv lists.
+"""
+
 # Readers
 from readers import M3UFileReader
 
