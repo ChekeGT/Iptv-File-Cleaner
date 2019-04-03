@@ -3,12 +3,19 @@
 # Requests
 import requests
 
+# Json
+import json
 
 class Authentication:
 	"""Manages all the taks related with authenticate the user."""
 
 	def __init__(self):
 		self.session = requests.Session()
+		self.session.headers.update(
+			{
+				"Content-Type": "application/json"
+			}
+		)
 
 	def login(self, username, password):
 
@@ -19,7 +26,7 @@ class Authentication:
 			'password': password
 		}
 
-		request = session.post('http://localhost:8000/users/login/', payload)
+		request = session.post('https://iptvfilecleaner.me/users/login/', data=json.dumps(payload))
 
 		response = request.json()
 
@@ -39,7 +46,7 @@ class Authentication:
 
 		session = self.session
 
-		url = f'http://localhost:8000/users/{username}/'
+		url = f'https://iptvfilecleaner.me/users/{username}/'
 		request = session.get(url)
 
 		response = request.json()
