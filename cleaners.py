@@ -1,9 +1,6 @@
 # Readers
 from readers import M3UFileReader
 
-# Writers
-from writers import BaseFileWriter
-
 
 class BaseIptvFileCleaner:
 	"""Base Iptv File Cleaner
@@ -26,7 +23,7 @@ class BaseIptvFileCleaner:
 class M3UFileCleaner(BaseIptvFileCleaner):
 	"""Manages the line filtering of a iptv list which type is M3U"""
 
-	def delete_unneeded_lines(self, file, output_file):
+	def delete_unneeded_lines(self, file):
 		"""Deletes the lines that the user dont want"""
 
 		segments, length = M3UFileReader.read(file)
@@ -44,7 +41,7 @@ class M3UFileCleaner(BaseIptvFileCleaner):
 			len(lines) - length
 		)
 
-		BaseFileWriter.write_lines(lines, output_file)
+		return lines
 
 	def filter_lines(self, segment):
 		"""Returns if a line matches with a pattern."""

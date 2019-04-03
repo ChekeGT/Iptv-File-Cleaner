@@ -10,8 +10,6 @@ class SimpleTextParser:
 
 		def __init__(self, separator_character):
 			"""Initialize the class"""
-			if separator_character == "":
-				separator_character = " "
 			self.separator_character = separator_character
 
 		def parse(self, segment_list):
