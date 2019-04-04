@@ -180,15 +180,35 @@ class ParsingCleaningWindow(QDialog):
 
         # Label
 
-        outputFileLabel = QLabel("Archivo de Salida:", self)
-        outputFileLabel.move(40, 360)
+        outputFileLabel = QLabel("Introduce el nombre de tu archivo de salida:", self)
+        outputFileLabel.move(40, 340)
 
-        # Button
+        # Input of the file name
 
-        outputFileSelectorButton = QPushButton("Seleccionar Archivo:", self)
-        outputFileSelectorButton.setFixedWidth(170)
-        outputFileSelectorButton.setFixedHeight(30)
-        outputFileSelectorButton.move(180, 355)
+        outputFileNameFrame = QFrame(self)
+        outputFileNameFrame.setFrameShape(QFrame.StyledPanel)
+        outputFileNameFrame.setFixedWidth(280)
+        outputFileNameFrame.setFixedHeight(28)
+        outputFileNameFrame.move(40, 366)
+
+        self.outputFileNameLineEdit = QLineEdit(outputFileNameFrame)
+        self.outputFileNameLineEdit.setFrame(False)
+        self.outputFileNameLineEdit.setTextMargins(8, 0, 4, 1)
+        self.outputFileNameLineEdit.setFixedWidth(238)
+        self.outputFileNameLineEdit.setFixedHeight(25)
+        self.outputFileNameLineEdit.move(40, 1)
+
+        # Image
+        outputFileNameImage = QLabel(outputFileNameFrame)
+        outputFileNameImage.setPixmap(QPixmap("img/file.png").scaled(
+                20,
+                20, 
+                Qt.KeepAspectRatio,
+                Qt.SmoothTransformation
+            )
+        )
+        outputFileNameImage.move(10, 4)
+
 
         # Change list button
 
@@ -202,7 +222,6 @@ class ParsingCleaningWindow(QDialog):
         confirmPatternButton.clicked.connect(self.add_pattern)
         changeIptvListButton.clicked.connect(self.changeIptvList)
         inputFileSelectorButton.clicked.connect(self.get_input_file)
-        outputFileSelectorButton.clicked.connect(self.get_output_file)
 
     def add_pattern(self):
         """Handles adding patterns to the patterns list."""
@@ -229,11 +248,13 @@ class ParsingCleaningWindow(QDialog):
         """Manages getting the input file."""
 
         try:
-            filename, file_type = QFileDialog.getOpenFileName(self)
-            
-            file = open(filename, 'w', encoding='utf-8')
+            filename = self.outputFileNameLineEdit.text()
 
-            self.output_file = file
+            if filename:
+
+                file = open(filename, 'w+', encoding='utf-8')
+
+                self.output_file = file
 
         except Exception as e:
             pass
@@ -242,9 +263,11 @@ class ParsingCleaningWindow(QDialog):
         """Handles the parsing or/and cleaning of an IptvList"""
 
         try:
+            self.get_output_file()
 
             input_file = self.input_file
             output_file = self.output_file
+
             msgBox = QMessageBox()
 
             if input_file and output_file:
@@ -282,6 +305,7 @@ class ParsingCleaningWindow(QDialog):
 
                     msgBox.setWindowTitle('Lineas borradas y cambiadas exitosamente.')
                     msgBox.setText('Todas las lineas han sido cambiadas de formato y limpiadas para adaptarse a tu deco ;).')
+                    self.cleanFields()
                 else:
                     msgBox.setWindowTitle('Error')
                     msgBox.setText('Necesitas poner un decodificador al cual pasar el archivo.')
@@ -299,14 +323,12 @@ class ParsingCleaningWindow(QDialog):
             msgbox.exec_()
             self.cleanFields()
 
-        finally:
-            self.cleanFields()
-
     def cleanFields(self):
         self.input_file = None
         self.output_file = None
         self.patterns = []
         self.decoderType.setCurrentIndex(-1)
+        self.outputFileNameLineEdit.clear()
 
 
 class WindowLogin(QMainWindow):
