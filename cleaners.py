@@ -54,7 +54,7 @@ class M3UFileCleaner(BaseIptvFileCleaner):
 		line = segment[1]
 		patterns = self.patterns
 		for pattern in patterns:
-			if line.startswith(pattern):
+			if pattern in line:
 				return False
 
 		return True
