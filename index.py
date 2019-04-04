@@ -297,6 +297,16 @@ class ParsingCleaningWindow(QDialog):
             text = 'De momento nuestro programa no soporta tu lista de iptv para limpiarla,pero puedes mandarnos un correo a nextpcreloaded@hotmail.com y crearemos esa funcionalidad(tambien mandanos la lista), por tu comprension gracias ;).'
             msgbox.setText(text)
             msgbox.exec_()
+            self.cleanFields()
+
+        finally:
+            self.cleanFields()
+
+    def cleanFields(self):
+        self.input_file = None
+        self.output_file = None
+        self.patterns = []
+        self.decoderType.setCurrentIndex(-1)
 
 
 class WindowLogin(QMainWindow):
