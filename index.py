@@ -213,69 +213,90 @@ class ParsingCleaningWindow(QDialog):
         self.patternLineEdit.clear()
 
     def get_input_file(self):
-        filename, file_type = QFileDialog.getOpenFileName(self)
-        
-        file = open(filename, 'r+', encoding='utf-8')
+        """Manages getting the input file."""
 
-        self.input_file = file
+        try:
+            filename, file_type = QFileDialog.getOpenFileName(self)
+            
+            file = open(filename, 'r+', encoding='utf-8')
+
+            self.input_file = file
+
+        except Exception as e:
+            pass
 
     def get_output_file(self):
-        filename, file_type = QFileDialog.getOpenFileName(self)
-        
-        file = open(filename, 'w', encoding='utf-8')
+        """Manages getting the input file."""
 
-        self.output_file = file
+        try:
+            filename, file_type = QFileDialog.getOpenFileName(self)
+            
+            file = open(filename, 'w', encoding='utf-8')
+
+            self.output_file = file
+
+        except Exception as e:
+            pass
 
     def changeIptvList(self):
         """Handles the parsing or/and cleaning of an IptvList"""
 
-        input_file = self.input_file
-        output_file = self.output_file
-        msgBox = QMessageBox()
+        try:
 
-        if input_file and output_file:
+            input_file = self.input_file
+            output_file = self.output_file
+            msgBox = QMessageBox()
 
-            patterns = self.patterns
+            if input_file and output_file:
 
-            if self.deleteMovies.isChecked():
-                patterns += [
-                    'movie',
-                    'movies',
-                    'peliculas',
-                    'pelicula'
-                ]
+                patterns = self.patterns
 
-            if self.deleteSeries.isChecked():
-                patterns += [
-                    'serie',
-                    'series'
-                ]
+                if self.deleteMovies.isChecked():
+                    patterns += [
+                        'movie',
+                        'movies',
+                        'peliculas',
+                        'pelicula'
+                    ]
 
-            decoder_type = self.decoderType.currentText()
-            if decoder_type:
+                if self.deleteSeries.isChecked():
+                    patterns += [
+                        'serie',
+                        'series'
+                    ]
 
-                if len(patterns) >= 1:
+                decoder_type = self.decoderType.currentText()
+                if decoder_type:
 
-                    cleaner = M3UFileCleaner(patterns)
-                    cleaned_lines = cleaner.delete_unneeded_lines(input_file)
+                    if len(patterns) >= 1:
 
-                    segment_list = M3UFileReader.cut_lines(cleaned_lines)
+                        cleaner = M3UFileCleaner(patterns)
+                        cleaned_lines = cleaner.delete_unneeded_lines(input_file)
 
+                        segment_list = M3UFileReader.cut_lines(cleaned_lines)
+
+                    else:
+                        segment_list, length = M3UFileReader.read(input_file)
+                    
+                    ParseAndWriteM3UToSimpleText(output_file, decoder_type, segment_list)
+
+                    msgBox.setWindowTitle('Lineas borradas y cambiadas exitosamente.')
+                    msgBox.setText('Todas las lineas han sido cambiadas de formato y limpiadas para adaptarse a tu deco ;).')
                 else:
-                    segment_list, length = M3UFileReader.read(input_file)
-                
-                ParseAndWriteM3UToSimpleText(input_file, output_file, decoder_type, segment_list)
-
-                msgBox.setWindowTitle('Lineas borradas y cambiadas exitosamente.')
-                msgBox.setText('Todas las lineas han sido cambiadas de formato y limpiadas para adaptarse a tu deco ;).')
+                    msgBox.setWindowTitle('Error')
+                    msgBox.setText('Necesitas poner un decodificador al cual pasar el archivo.')
             else:
                 msgBox.setWindowTitle('Error')
-                msgBox.setText('Necesitas poner un decodificador al cual pasar el archivo.')
-        else:
-            msgBox.setWindowTitle('Error')
-            msgBox.setText('No has seleccionado ningun archivo, seleccionalos porfavor.')
+                msgBox.setText('No has seleccionado ningun archivo, seleccionalos porfavor.')
 
-        msgBox.exec_()
+            msgBox.exec_()
+
+        except Exception as e:
+            msgbox = QMessageBox()
+            msgbox.setWindowTitle('Ha ocurrido un error con tu lista.')
+            text = 'De momento nuestro programa no soporta tu lista de iptv para limpiarla,pero puedes mandarnos un correo a nextpcreloaded@hotmail.com y crearemos esa funcionalidad(tambien mandanos la lista), por tu comprension gracias ;).'
+            msgbox.setText(text)
+            msgbox.exec_()
 
 
 class WindowLogin(QMainWindow):
