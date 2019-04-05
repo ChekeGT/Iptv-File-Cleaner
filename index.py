@@ -452,7 +452,7 @@ class WindowLogin(QMainWindow):
 
         # Information
 
-        infoLink = 'https://localhost:63342/index.html'
+        infoLink = 'https://iptvfilecleaner.com/index.html'
 
         informationLabel = QLabel(f"<a href='{infoLink}'>Comprar</a>.", self)
         informationLabel.setOpenExternalLinks(True)
