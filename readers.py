@@ -39,6 +39,7 @@ class M3UFileReader:
 			not line.startswith(' ') and
 			not line == '\n'
 		]
+
 		return new_lines
 
 	def expand_segments(segments):
@@ -58,17 +59,18 @@ class M3UFileReader:
 
 	def get_name(segment):
 		"""Gets the name of a segment."""
+
 		line = segment[0]
 
 		# Where tvg-name tag starts + 10 is exactly where
 		# the channel television name starts.
 		tvg_name_start = line.index('tvg-name="') + 10
-		# Where tvg-logo starts is exactly where
-		# the channel television name ends.
-		tvg_name_end = line.index('tvg-logo')
+
+		# This will return the name of the cannel
+		tvg_name_field = line[tvg_name_start:]
+		tvg_name_field = tvg_name_field[:tvg_name_field.index('"')]
 
 		# We delete all the quotes and spaces cause we just want the name.
-		name = line[tvg_name_start:tvg_name_end].replace('"', "")
-		name = name.replace(" ", "")
+		name = tvg_name_field.replace(',', "")
 
-		return name
+		return name.replace('"', "")
