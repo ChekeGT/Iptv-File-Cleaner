@@ -71,6 +71,6 @@ class M3UFileReader:
 		tvg_name_field = tvg_name_field[:tvg_name_field.index('"')]
 
 		# We delete all the quotes and spaces cause we just want the name.
-		name = tvg_name_field.replace(',', "")
+		name = tvg_name_field.replace(',', "").replace(" ", "")
 
 		return name.replace('"', "")
